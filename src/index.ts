@@ -1,17 +1,17 @@
 import { CountryService } from "./countryService";
 import { Region } from "./interfaces";
 
-async function main() {
-  const service = new CountryService();
+const countryService = new CountryService();
 
-  const countries = await service.fetchCountries();
-  console.log("Total de países:", countries.length);
+(async () => {
+  await countryService.fetchCountries();
 
-  const searchResult = service.searchByName(countries, "br");
-  console.log("Pesquisa 'br':", searchResult.map(c => c.name));
+  console.log("Total de países:", countryService.getAll().length);
 
-  const regionResult = service.filterByRegion(countries, Region.Americas);
-  console.log("Países das Américas:", regionResult.map(c => c.name));
-}
+  const resultadoPesquisa = countryService.searchByName("uni");
+  console.log("Pesquisa 'uni':", resultadoPesquisa.map((c) => c.name));
 
-main();
+  const resultadoRegiao = countryService.filterByRegion(Region.Americas);
+  console.log("Países das Américas:", resultadoRegiao.map((c) => c.name));
+})();
+

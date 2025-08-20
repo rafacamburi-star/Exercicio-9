@@ -2,35 +2,39 @@ import axios from "axios";
 import { ICountry, Region } from "./interfaces";
 
 export class CountryService {
-  private apiUrl = "https://restcountries.com/v3.1/all?fields=name,capital,region,population,flags";
+  private countries: ICountry[] = [];
 
-  // Busca todos os países
-  async fetchCountries(): Promise<ICountry[]> {
+  async fetchCountries(): Promise<void> {
     try {
-      const response = await axios.get(this.apiUrl);
-      const countries: ICountry[] = response.data.map((c: any) => ({
+      const response = await axios.get<ICountry[]>(
+        "https://restcountries.com/v3.1/all?fields=name,region,capital,population,flags"
+      );
+
+      this.countries = response.data.map((c: any) => ({
         name: c.name.common,
-        capital: c.capital?.[0] || "N/A",
         region: c.region as Region,
+        capital: c.capital ? c.capital[0] : undefined,
         population: c.population,
         flags: c.flags,
       }));
-      return countries;
     } catch (error) {
       console.error("Erro ao buscar países:", error);
-      return [];
+      this.countries = [];
     }
   }
 
-  // Pesquisa por nome
-  searchByName(countries: ICountry[], term: string): ICountry[] {
-    return countries.filter((c) =>
-      c.name.toLowerCase().includes(term.toLowerCase())
+  searchByName(name: string): ICountry[] {
+    return this.countries.filter((c) =>
+      c.name.toLowerCase().includes(name.toLowerCase())
     );
   }
 
-  // Filtra por região
-  filterByRegion(countries: ICountry[], region: Region): ICountry[] {
-    return countries.filter((c) => c.region === region);
+  filterByRegion(region: Region): ICountry[] {
+    return this.countries.filter((c) => c.region === region);
+  }
+
+  getAll(): ICountry[] {
+    return this.countries;
   }
 }
+
